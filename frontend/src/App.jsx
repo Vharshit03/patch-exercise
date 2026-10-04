@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SearchBar from './components/SearchBar';
 import StatusFilter from './components/StatusFilter';
 import TaskTable from './components/TaskTable';
@@ -6,10 +6,22 @@ import { useTasks } from './hooks/useTasks';
 
 export default function App() {
   const [query, setQuery] = useState('');
+  const [debounceQuery,setDebounceQuery] = useState('')
   const [status, setStatus] = useState('');
   const [page, setPage] = useState(1);
 
-  const { tasks, total, loading, error } = useTasks(query, status, page, 10);
+  useEffect(()=>{
+    const timer = setTimeout(()=>{
+      setDebounceQuery(query)
+    },500)
+
+    return ()=>{
+      clearTimeout(timer)
+    };
+
+  },[query])
+
+  const { tasks, total, loading, error } = useTasks(debounceQuery, status, page, 10);
 
   const totalPages = Math.ceil(total / 10);
 
